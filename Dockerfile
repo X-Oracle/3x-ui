@@ -49,7 +49,7 @@ RUN chmod +x \
   /usr/bin/x-ui
 
 RUN apk add nginx
-
+COPY --from=builder /app/nginx.conf /etc/nginx/
 VOLUME [ "/etc/x-ui" ]
 CMD [ "./x-ui" ]
 ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
