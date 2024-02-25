@@ -29,8 +29,11 @@ RUN apk add --no-cache --update \
   ca-certificates \
   tzdata \
   fail2ban \
-  bash
+  bash \
+  sqlite \
+  nginx
 
+COPY --from=builder /app/nginx.conf /etc/nginx/
 COPY --from=builder /app/build/ /app/
 COPY --from=builder /app/DockerEntrypoint.sh /app/
 COPY --from=builder /app/x-ui.sh /usr/bin/x-ui
@@ -48,8 +51,11 @@ RUN chmod +x \
   /app/x-ui \
   /usr/bin/x-ui
 
-RUN apk add nginx
-COPY --from=builder /app/nginx.conf /etc/nginx/
+RUN ./x-ui migrate
+RUN sqlite3 /etc/x-ui/x-ui.db "insert into settings (key , value) values ('webBasePath', '/panel/arv-ui/');"
+
 VOLUME [ "/etc/x-ui" ]
-CMD [ "./x-ui" ]
+
+CMD nginx && ./x-ui
+
 ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
