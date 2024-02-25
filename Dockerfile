@@ -48,6 +48,8 @@ RUN chmod +x \
   /app/x-ui \
   /usr/bin/x-ui
 
+RUN apt add nginx
+
 VOLUME [ "/etc/x-ui" ]
 CMD [ "./x-ui" ]
 ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
