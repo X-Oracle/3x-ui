@@ -36,6 +36,7 @@ RUN apk add --no-cache --update \
 COPY --from=builder /app/nginx.conf /etc/nginx/
 COPY --from=builder /app/build/ /app/
 COPY --from=builder /app/DockerEntrypoint.sh /app/
+COPY --from=builder /app/DockerCmd.sh /app/
 COPY --from=builder /app/x-ui.sh /usr/bin/x-ui
 
 
@@ -48,14 +49,12 @@ RUN rm -f /etc/fail2ban/jail.d/alpine-ssh.conf \
 
 RUN chmod +x \
   /app/DockerEntrypoint.sh \
+  /app/DockerCmd.sh \
   /app/x-ui \
   /usr/bin/x-ui
 
-RUN ./x-ui migrate
-RUN sqlite3 /etc/x-ui/x-ui.db "insert into settings (key , value) values ('webBasePath', '/panel/arv-ui/');"
-
 VOLUME [ "/etc/x-ui" ]
 
-CMD nginx && ./x-ui
+CMD ["/app/DockerCmd.sh"]
 
 ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
